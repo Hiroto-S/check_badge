@@ -1,0 +1,110 @@
+#!/usr/bin/env ruby
+# -*- coding: utf-8 -*-
+require 'org-ruby'
+require 'fileutils'
+require 'colorize'
+require 'csv'
+
+# $jekyll_table_path = '/Users/yuuki/gem/my_blog/_posts/_posts'
+
+#file = '/Users/yuuki/gem/my_blog/_posts'
+#csv_data = CSV.read("/Users/yuuki/gem/my_blog/csv/check_badges.csv", headers: true)
+csv_data = File.read("/Users/yuuki/gem/my_blog/csv/check_badges.csv").chomp
+headers, *data = csv_data.lines.map { |line| line.chomp.split(',') }
+count = data.count
+transdata = data.transpose
+days = transdata[0].uniq.sort
+#days = transdata[0].uniq.sort{|a,b|b<=>a}
+learners = transdata[2].uniq.sort
+color = ""
+
+File.open("/Users/yuuki/gem/my_blog/index.md","w") do |file|
+  file << "tutor's color:  \n"
+  file << "![badge](https://img.shields.io/badge/tutor-nishitani-green.svg)"
+  file << "![badge](https://img.shields.io/badge/tutor-kono-red.svg)"
+  file << "![badge](https://img.shields.io/badge/tutor-nichiyama-yellow.svg)"
+  file << "![badge](https://img.shields.io/badge/tutor-omri-orange.svg)"
+  file << "![badge](https://img.shields.io/badge/tutor-okuda-lightgray.svg)"
+  file << "![badge](https://img.shields.io/badge/tutor-okamoto-blue.svg)"
+  file << "![badge](https://img.shields.io/badge/tutor-nakahori-%2340e0d0.svg)"
+  file << "![badge](https://img.shields.io/badge/tutor-yamaguchi-%236a5acd.svg)"
+  file << "![badge](https://img.shields.io/badge/tutor-okabata-%23ffffff.svg)"
+  file << "![badge](https://img.shields.io/badge/tutor-kawai-%23800080.svg)"
+  file << "![badge](https://img.shields.io/badge/tutor-ikeda-%2300bfff.svg)"
+  file << "\n\n\n"
+  file << "|バッジ"
+  i = 0
+  days.each do |day|
+    if day == nil then
+      break
+    end
+    file << "|"
+    file << day
+    i = i + 1
+  end
+  file << "|"
+  file << "\n"
+  i = 0
+  learners.each do |learner|
+#    if learner == nil then
+#      break
+#    end
+    file << "|"
+    file << learner
+    file << "|"
+    m = 0
+    n = 0
+    days.each do |day|
+      count = 1
+      data.each do |d,t,l,j,title|
+        if j == "attend" && d == day && l == learner then
+          if t == "nishitani"
+            color = "green"
+          elsif t == "kono"
+            color = "red"
+          elsif t == "nichiyama"
+            color = "yellow"
+          elsif t == "omri"
+            color = "orange"
+          elsif t == "okuda"
+            color = "lightgray"
+          elsif t == "okamoto"
+            color = "blue"
+          elsif t == "nakahori"
+            color = "%2340e0d0"
+          elsif t == "yamaguchi"
+            color = "%236a5acd"
+          elsif t == "okabata"
+            color = "%23ffffff"
+          elsif t == "kawai"
+            color = "%23800080"
+          elsif t == "ikeda"
+            color = "%2300bfff"
+          else
+            color = "black"
+          end
+#          p day1
+#          p learner
+#          p count
+          badge = "https://img.shields.io/badge/#{d}-#{title}-#{color}.svg"
+          link = "![badge](" + badge +")"
+          file << link
+          file << "|"
+          break
+        elsif count == data.count
+          file << "miss"
+          file << "|"
+        end
+        count = count + 1
+        m = m + 1
+        n = n + 1
+      end
+    end
+#  badge = "https://img.shields.io/badge/#{data["date"]}-#{data["title"]}-#{color}.svg"#?style=#{ARGV[3]}&logo=appveyor"
+#  file << badge
+    file << "\n"
+    i = i + 1
+  end
+end
+
+p "created index.md, exist badge_table in this file!"
